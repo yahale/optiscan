@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optiscan</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        #image-upload-section, #dry-eye-section, #snellen-section {
+            padding: 25px;
+            margin-bottom: 30px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+        #image-upload-section h2, #dry-eye-section h2, #snellen-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+        }
+        label {
+            font-weight: 500;
+            color: #34495e;
+            margin-bottom: 8px;
+            display: block;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        #submit-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            display: block;
+            margin-top: 10px;
+        }
+        #submit-btn:hover {
+            background-color: #218838;
+        }
+        #results {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        #results h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: 400;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 6px;
+            border: 1px solid #ef9a9a;
+        }
+        .hidden {
+            display: none;
+        }
+        .snellen-line {
+            margin: 15px 0;
+        }
+        .snellen-letter {
+            margin: 0 5px;
+            font-size: 1em;
+        }
+        #calibration-box {
+            border: 2px dashed #333;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Optiscan - Eye Disease Diagnosis</h1>
+
+        <div id="snellen-section">
+            <h2>Snellen Test</h2>
+            <div id="step1">
+                <h3>Step 1: Screen Calibration</h3>
+                <p>Place a credit card horizontally inside the box. Adjust the slider until the width fits exactly.</p>
+                <div id="calibration-box"></div>
+                <input type="range" id="calibration-slider" min="200" max="600" value="300">
+                <br>
+                <button id="calibrate-btn">It Fits – Continue</button>
+            </div>
+            <div id="step2" class="hidden">
+                <h3>Step 2: Sit 50 cm from the screen</h3>
+                <button id="distance-btn">I'm Ready</button>
+            </div>
+            <div id="step3" class="hidden">
+                <h3>Step 3: Enter Your Age</h3>
+                <input type="number" id="age-input" placeholder="e.g. 25" min="1" max="120" class="form-control">
+                <br>
+                <button id="start-btn">Start Test</button>
+            </div>
+            <div id="chart-container" class="hidden"></div>
+            <div id="results-form" class="hidden"></div>
+            <div id="snellen-error" class="error-message" style="display: none;"></div>
+        </div>
+
+        <div id="dry-eye-section">
+            <h2>Dry Eye Assessment</h2>
+            <label for="gender">Gender:</label>
+            <select id="gender" class="form-control">
+                <option value="F">Female</option>
+                <option value="M">Male</option>
+            </select>
+            <label for="age_dryeye">Age:</label>
+            <input type="number" id="age_dryeye" class="form-control" min="18" required>
+            <label for="sleep_duration">Sleep Duration (hours):</label>
+            <input type="number" id="sleep_duration" class="form-control" min="0" step="0.5" required>
+            <label for="sleep_quality">Sleep Quality (1-5):</label>
+            <input type="number" id="sleep_quality" class="form-control" min="1" max="5" required>
+            <label for="stress_level">Stress Level (1-5):</label>
+            <input type="number" id="stress_level" class="form-control" min="1" max="5" required>
+            <label for="sleep_disorder">Sleep Disorder:</label>
+            <select id="sleep_disorder" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="wake_up_night">Wake Up During Night:</label>
+            <select id="wake_up_night" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="sleepy_day">Feel Sleepy During Day:</label>
+            <select id="sleepy_day" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="caffeine">Caffeine Consumption:</label>
+            <select id="caffeine" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="alcohol">Alcohol Consumption:</label>
+            <select id="alcohol" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="smoking">Smoking:</label>
+            <select id="smoking" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="device_bed">Smart Device Before Bed:</label>
+            <select id="device_bed" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="screen_time">Average Screen Time (hours):</label>
+            <input type="number" id="screen_time" class="form-control" min="0" step="0.5" required>
+            <label for="blue_light_filter">Blue Light Filter:</label>
+            <select id="blue_light_filter" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="discomfort">Discomfort/Eye Strain:</label>
+            <select id="discomfort" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="redness">Redness in Eye:</label>
+            <select id="redness" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="itchiness">Itchiness/Irritation:</label>
+            <select id="itchiness" class="form-control">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+            </select>
+            <label for="systolic">Systolic Blood Pressure:</label>
+            <input type="number" id="systolic" class="form-control" required>
+            <label for="diastolic">Diastolic Blood Pressure:</label>
+            <input type="number" id="diastolic" class="form-control" required>
+            <div id="dryeye-error" class="error-message" style="display: none;"></div>
+        </div>
+
+        <div id="image-upload-section">
+            <h2>Image-Based Diagnosis</h2>
+            <label for="image-upload">Upload Eye Image:</label>
+            <input type="file" id="image-upload" accept="image/*" class="form-control-file">
+            <div id="image-error" class="error-message" style="display: none;"></div>
+        </div>
+
+        <button id="submit-btn" class="btn btn-primary">Get Diagnosis</button>
+
+        <div id="results" style="display: none;">
+            <h2>Diagnosis Results</h2>
+            <div id="snellen-results"></div>
+            <div id="dry-eye-results"></div>
+            <div id="image-results"></div>
+        </div>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        let pxPerMm = null;
+
+        const snellenLines = [
+            { label: "20/200", letters: ["E"] },
+            { label: "20/100", letters: ["F", "P"] },
+            { label: "20/70", letters: ["T", "O", "Z"] },
+            { label: "20/50", letters: ["L", "P", "E", "D"] },
+            { label: "20/40", letters: ["P", "E", "C", "F", "D"] },
+            { label: "20/30", letters: ["E", "D", "F", "C", "Z", "P"] },
+            { label: "20/25", letters: ["F", "E", "L", "O", "P", "Z", "D"] },
+            { label: "20/20", letters: ["D", "E", "F", "P", "O", "T", "E", "C"] },
+            { label: "20/15", letters: ["L", "E", "F", "O", "D", "P", "C", "T"] },
+            { label: "20/13", letters: ["F", "D", "P", "L", "T", "C", "E", "O"] },
+            { label: "20/10", letters: ["P", "E", "Z", "O", "L", "C", "F", "T", "D"] }
+        ];
+
+        const snellenFontHeights = [
+            12, 6.1, 4.28, 3.04, 2.49,
+            1.8, 1.53, 1.25, 0.913, 0.83, 0.53
+        ];
+
+        function compareTypedLetters(userInput, expected) {
+            const results = [];
+            let correct = 0;
+            for (let i = 0; i < expected.length; i++) {
+                const userChar = userInput[i] || "";
+                const isCorrect = userChar === expected[i];
+                results.push({ letter: userChar, correct: isCorrect });
+                if (isCorrect) correct++;
+            }
+            return { correct, total: expected.length, results };
+        }
+
+        $("#calibration-slider").on("input", function () {
+            const width = this.value;
+            const cardAspect = 53.98 / 85.6;
+            const height = width * cardAspect;
+            const box = document.getElementById("calibration-box");
+            box.style.width = width + "px";
+            box.style.height = height + "px";
+        });
+
+        $("#calibrate-btn").on("click", function () {
+            const box = document.getElementById("calibration-box");
+            pxPerMm = box.offsetWidth / 85.6;
+            if (pxPerMm < 1) {
+                alert("Calibration failed. Please try again.");
+                return;
+            }
+            $("#step1").addClass("hidden");
+            $("#step2").removeClass("hidden");
+        });
+
+        $("#distance-btn").on("click", function () {
+            $("#step2").addClass("hidden");
+            $("#step3").removeClass("hidden");
+        });
+
+        $("#start-btn").on("click", function () {
+            const age = parseInt($("#age-input").val());
+            if (!age || age <= 0) {
+                alert("Enter a valid age.");
+                return;
+            }
+            $("#step3").addClass("hidden");
+            $("#chart-container").removeClass("hidden");
+            $("#results-form").removeClass("hidden");
+            generateSnellenChart();
+        });
+
+        function generateSnellenChart() {
+            const container = $("#chart-container")[0];
+            const form = $("#results-form")[0];
+            container.innerHTML = "";
+            form.innerHTML = "";
+
+            snellenLines.forEach((line, idx) => {
+                const fontSize = snellenFontHeights[idx] * pxPerMm;
+
+                const lineDiv = document.createElement("div");
+                lineDiv.className = "snellen-line";
+                lineDiv.style.fontSize = fontSize + "px";
+                lineDiv.style.lineHeight = fontSize + "px";
+
+                const label = document.createElement("span");
+                label.className = "line-label";
+                label.textContent = line.label + ": ";
+                lineDiv.appendChild(label);
+
+                line.letters.forEach(char => {
+                    const letter = document.createElement("span");
+                    letter.className = "snellen-letter";
+                    letter.textContent = char;
+                    lineDiv.appendChild(letter);
+                });
+
+                container.appendChild(lineDiv);
+
+                const inputRow = document.createElement("div");
+                inputRow.innerHTML = `
+          <div style="margin-top: 10px;">
+            <label>${line.label} – Type letters you saw: </label>
+            <input type="text" id="input-line${idx}" placeholder="e.g. EDP" style="width: 100px;" class="form-control"/>
+          </div>
+        `;
+                form.appendChild(inputRow);
+            });
+
+            $("#calc-btn").removeClass("hidden");
+        }
+
+        $('#submit-btn').click(function(event) {
+            event.preventDefault();
+
+            // Clear previous results and errors
+            $('#image-results').html('');
+            $('#dry-eye-results').html('');
+            $('#snellen-results').html('');
+            $('.error-message').hide();
+            $('#results').hide();
+
+            // --- Snellen Input ---
+            let ageSnellen = parseInt($("#age-input").val());
+            let lastLineIdx = -1;
+            let mistakesOnLastLine = 0;
+
+            if ($("#results-form:visible").length) { // Only process if Snellen test was done.
+                snellenLines.forEach((line, idx) => {
+                    const input = $("#input-line" + idx).val();
+                    const userInput = input.toUpperCase().replace(/[^A-Z]/g, "");
+                    const expected = line.letters.join("");
+
+                    if (userInput.length > 0) {
+                        lastLineIdx = idx;
+
+                        let correctCount = 0;
+                        for (let i = 0; i < Math.min(userInput.length, expected.length); i++) {
+                            if (userInput[i] === expected[i]) correctCount++;
+                        }
+
+                        mistakesOnLastLine = expected.length - correctCount;
+                    }
+                });
+            }
+            let snellenData = {};
+            if (ageSnellen) {
+                 snellenData = {
+                    line: lastLineIdx + 1,
+                    mistakes: mistakesOnLastLine,
+                    age: ageSnellen
+                };
+            }
+
+
+            // --- Image Input ---
+            let imageFile = $('#image-upload').prop('files')[0];
+            let imageData = new FormData();
+            if (imageFile) {
+                imageData.append('file', imageFile);
+            }
+
+            // --- Dry Eye Input ---
+            let gender = $('#gender').val();
+            let ageDryEye = $('#age_dryeye').val();
+            let sleepDuration = $('#sleep_duration').val();
+            let sleepQuality = $('#sleep_quality').val();
+            let stressLevel = $('#stress_level').val();
+            let sleepDisorder = $('#sleep_disorder').val();
+            let wakeUpNight = $('#wake_up_night').val();
+            let sleepyDay = $('#sleepy_day').val();
+            let caffeine = $('#caffeine').val();
+            let alcohol = $('#alcohol').val();
+            let smoking = $('#smoking').val();
+            let deviceBed = $('#device_bed').val();
+            let screenTime = $('#screen_time').val();
+            let blueLightFilter = $('#blue_light_filter').val();
+            let discomfort = $('#discomfort').val();
+            let redness = $('#redness').val();
+            let itchiness = $('#itchiness').val();
+            let systolic = $('#systolic').val();
+            let diastolic = $('#diastolic').val();
+
+            let dryEyeData = {
+            Gender: gender,
+            Age: ageDryEye,
+            Sleep_duration: sleepDuration,
+            Sleep_quality: sleepQuality,
+            Stress_level: stressLevel,
+            Sleep_disorder: sleepDisorder,
+            Wake_up_during_night: wakeUpNight,
+            Feel_sleepy_during_day: sleepyDay,
+            Caffeine_consumption: caffeine,
+            Alcohol_consumption: alcohol,
+            Smoking: smoking,
+            Smart_device_before_bed: deviceBed,
+            Average_screen_time: screenTime,
+            Blue_light_filter: blueLightFilter,
+            Discomfort_Eye_strain: discomfort,
+            Redness_in_eye: redness,
+            Itchiness_Irritation_in_eye: itchiness,
+            Systolic: systolic,
+            Diastolic: diastolic
+        };
+
+            let hasErrors = false;
+            if (imageFile) {
+                let validExtensions = ['image/jpeg', 'image/png', 'image/gif'];
+                if ($.inArray(imageFile.type, validExtensions) === -1) {
+                    $('#image-error').text('Invalid file type. Please upload a valid image (jpeg, png, gif).').show();
+                    hasErrors = true;
+                }
+            }
+            if (!ageDryEye || !sleepDuration || !sleepQuality || !stressLevel || !systolic || !diastolic) {
+                $('#dryeye-error').text('Please fill in all required fields for the Dry Eye Assessment.').show();
+                hasErrors = true;
+            }
+            if (ageSnellen && lastLineIdx === -1) {
+                 $('#snellen-error').text('Please fill in  Snellen Test.').show();
+                  hasErrors = true;
+            }
+
+
+            if (hasErrors) {
+                return;
+            }
+            if (imageFile) {
+                imageData.append('dry_eye_data', JSON.stringify(dryEyeData));
+            }
+            else {
+                 imageData.append('dry_eye_data', JSON.stringify(dryEyeData));
+            }
+            imageData.append('snellen_data', JSON.stringify(snellenData));
+
+            $.ajax({
+                url: '/predict',
+                type: 'POST',
+                data: imageData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    $('#results').show();
+                    if (response.snellen_prediction) {
+                        $('#snellen-results').html(`<h2>Snellen Test</h2><p><strong>Diagnosis:</strong> ${response.snellen_prediction.diagnosis}</p>`);
+                    }
+                    if (response.dry_eye_prediction) {
+                        $('#dry-eye-results').html(`<h2>Dry Eye Assessment</h2><p><strong>Diagnosis:</strong> ${response.dry_eye_prediction.dry_eye_probability}</p>`);
+                    }
+                    if (response.image_prediction) {
+                        $('#image-results').html(`
+                            <h2>Image-Based Diagnosis</h2>
+                            <p><strong>Predicted Class:</strong> ${response.image_prediction.predicted_class_name}</p>
+                        `);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#results').show();
+                    $('#results').html('<h2>Error</h2><p>An error occurred: ' + xhr.responseText + '</p>');
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

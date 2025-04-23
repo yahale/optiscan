@@ -1,0 +1,29 @@
+# .gitignore
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+venv/
+
+# Environment/secrets
+.env
+*.key
+*.env*
+
+# ML Models (keep excluded)
+*.keras
+*.pkl
+*.h5
+*.joblib
+
+# System files
+.DS_Store
+*.log
+*.tmp
+*.bak
+
+# Git-related (redundant but safe to keep)
+.git/
+.gitignore

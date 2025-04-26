@@ -10,3 +10,5 @@ python-multipart
 scikit-learn
 joblib
 pandas
+Jinja2
+xgboost

@@ -1,0 +1,40 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f8f9fa;
+  text-align: center;
+}
+
+input, button {
+  padding: 10px;
+  margin: 5px;
+  font-size: 16px;
+}
+
+.snellen-line {
+  margin: 15px 0;
+}
+
+/* ✅ Updated bold styling for Snellen letters */
+.snellen-letter {
+  margin: 0 5px;
+  font-weight: 900;
+  font-family: 'Arial Black', 'Impact', 'Courier New', monospace;
+  letter-spacing: 2px;
+  text-shadow: 0 0 0.5px #000;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.hidden {
+  display: none;
+}

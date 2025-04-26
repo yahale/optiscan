@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OPTISCAN - Your Future Optician</title>
+    <style>
+        body {
+            background-color: #FFF8E7;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        section {
+            padding: 50px;
+            max-width: 1000px;
+            margin: auto;
+        }
+        .landing {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        h1 {
+            font-size: 64px;
+            margin: 0;
+        }
+        h2 {
+            font-size: 28px;
+            margin-top: 10px;
+            color: #555;
+        }
+        h3 {
+            margin-top: 30px;
+            font-size: 24px;
+        }
+        .section-title {
+            margin-top: 100px;
+            font-size: 36px;
+            text-align: center;
+        }
+        input, select, button, label, textarea {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            display: block;
+            width: 90%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+        }
+        button {
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        #calibration-box {
+            margin: 20px auto;
+            border: 2px dashed black;
+            width: 300px;
+            height: 188px; /* Proportional to 8.6:5.4 */
+        }
+        .snellen-line {
+            margin: 20px 0;
+        }
+        .snellen-line input[type="text"] {
+            width: 300px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .snellen-line input[type="range"] {
+            width: 150px;
+            display: inline-block;
+        }
+        .question-block {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+
+
+    <!-- Landing page -->
+    <div class="landing">
+        <h1>OPTISCAN</h1>
+        <h2 class="shine">Your Future Optician</h2>
+    </div>
+
+    <!-- Main content starts here -->
+    <section id="snellen-test">
+        <h2 class="section-title">Test 1: Snellen Test</h2>
+
+        <h3>Step 1: Screen Calibration</h3>
+        <p>Place a credit card horizontally inside the box. Adjust the slider until the box width matches.</p>
+        <div id="calibration-box"></div>
+        <input type="range" id="calibration-slider" min="200" max="600" value="300">
+        <button onclick="calibrateScreen()">It Fits – Continue</button>
+
+        <h3 style="margin-top: 50px;">Step 2: Snellen Chart</h3>
+        <div id="snellen-letters"></div>
+    </section>
+
+    <section id="dry-eye-test">
+        <h2 class="section-title">Test 2: Dry Eye Assessment</h2>
+
+        <div class="question-block">
+            <label>Gender</label>
+            <select id="gender">
+                <option value="F">Female</option>
+                <option value="M">Male</option>
+            </select>
+
+            <label>Age</label>
+            <input type="number" id="dry_age">
+
+            <label>Sleep Duration (hours)</label>
+            <input type="number" id="sleep_duration">
+
+            <label>Sleep Quality (1-5)</label>
+            <input type="number" id="sleep_quality" min="1" max="5">
+
+            <label>Stress Level (1-5)</label>
+            <input type="number" id="stress_level" min="1" max="5">
+
+            <label>Sleep Disorder</label>
+            <select id="sleep_disorder"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Wake Up During Night</label>
+            <select id="wake_up_during_night"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Feel Sleepy During Day</label>
+            <select id="feel_sleepy"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Caffeine Consumption</label>
+            <select id="caffeine"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Alcohol Consumption</label>
+            <select id="alcohol"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Smoking</label>
+            <select id="smoking"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Smart Device Before Bed</label>
+            <select id="smart_device"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Average Screen Time (hours)</label>
+            <input type="number" id="screen_time">
+
+            <label>Blue Light Filter</label>
+            <select id="blue_light"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Discomfort/Eye Strain</label>
+            <select id="eye_strain"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Redness in Eye</label>
+            <select id="redness"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Itchiness/Irritation in Eye</label>
+            <select id="itchiness"><option value="N">No</option><option value="Y">Yes</option></select>
+
+            <label>Systolic Blood Pressure</label>
+            <input type="number" id="systolic">
+
+            <label>Diastolic Blood Pressure</label>
+            <input type="number" id="diastolic">
+        </div>
+    </section>
+
+    <section id="image-upload">
+        <h2 class="section-title">Test 3: Image-Based Diagnosis</h2>
+
+        <input type="file" id="eye-image" accept="image/*">
+        <button onclick="getDiagnosis()">Get Diagnosis</button>
+    </section>
+
+    <div id="result" style="text-align:center; margin: 50px; font-size:22px;"></div>
+
+    <script>
+	// Show sunglasses on scroll
+	window.addEventListener('scroll', function() {
+    		const sunglasses = document.getElementById('floating-sunglasses');
+    		const scrollY = window.scrollY;
+
+    		if (scrollY > 200) { // after scrolling 200px
+        		sunglasses.classList.add('show-sunglasses');
+    		} else {
+        		sunglasses.classList.remove('show-sunglasses');
+    		}
+	});
+
+	// Smooth auto-scroll down to Snellen Test after 4 seconds
+	window.onload = function() {
+    		setTimeout(() => {
+        		document.getElementById('snellen-test').scrollIntoView({ behavior: 'smooth' });
+    	}, 4000); // 4 seconds delay
+	};
+	
+
+        // Calibration box resizing
+	let pxPerMm = null;
+	const snellenLines = [
+   		{ label: "20/200", letters: ["E"] },
+    		{ label: "20/100", letters: ["F", "P"] },
+    		{ label: "20/70", letters: ["T", "O", "Z"] },
+    		{ label: "20/50", letters: ["L", "P", "E", "D"] },
+  		{ label: "20/40", letters: ["P", "E", "C", "F", "D"] },
+ 		{ label: "20/30", letters: ["E", "D", "F", "C", "Z", "P"] },
+    		{ label: "20/25", letters: ["F", "E", "L", "O", "P", "Z", "D"] },
+    		{ label: "20/20", letters: ["D", "E", "F", "P", "O", "T", "E", "C"] },
+    		{ label: "20/15", letters: ["L", "E", "F", "O", "D", "P", "C", "T"] },
+    		{ label: "20/13", letters: ["F", "D", "P", "L", "T", "C", "E", "O"] },
+    		{ label: "20/10", letters: ["P", "E", "Z", "O", "L", "C", "F", "T", "D"] }
+	];
+
+	const snellenFontHeights = [12, 6.1, 4.28, 3.04, 2.49, 1.8, 1.53, 1.25, 0.913, 0.83, 0.53]; // mm heights
+
+	function calibrateScreen() {
+    		const box = document.getElementById('calibration-box');
+    		const slider = document.getElementById('calibration-slider');
+    		const width = parseFloat(slider.value);
+    		const height = width * (5.4 / 8.6);  // maintain 8.6/5.4 ratio
+    		box.style.width = width + "px";
+    		box.style.height = height + "px";
+
+    		// Set px per mm based on credit card width (85.6 mm)
+   		 pxPerMm = width / 85.6;
+
+    		// Load snellen chart now
+    		loadSnellenChart();
+	}
+
+	// Section reveal on scroll
+	const sections = document.querySelectorAll('section');
+
+	window.addEventListener('scroll', () => {
+    		sections.forEach(section => {
+        		const sectionTop = section.getBoundingClientRect().top;
+        		const windowHeight = window.innerHeight;
+
+        		if (sectionTop < windowHeight - 100) {
+            			section.classList.add('section-visible');
+        		}
+    		});
+	});
+
+
+	function loadSnellenChart() {
+    		const container = document.getElementById('snellen-letters');
+    		container.innerHTML = "";
+
+    		snellenLines.forEach((line, index) => {
+        		const div = document.createElement('div');
+        		div.className = 'snellen-line';
+        
+        		// Calculate font size in pixels
+        		const fontSizePx = (snellenFontHeights[index] * pxPerMm).toFixed(2);
+
+        		const lettersHTML = line.letters.map(letter =>
+           			 `<span style="font-size:${fontSizePx}px; margin:5px;">${letter}</span>`
+       			 ).join(' ');
+
+        		div.innerHTML = `<strong>${line.label}:</strong> ${lettersHTML}
+            			<input type="text" id="input-${index}" placeholder="Type here..." style="margin-left:10px;">
+            			<input type="range" min="0" max="2" id="effort-${index}" value="1" style="margin-left:10px;">`;
+        
+        		container.appendChild(div);
+    		});
+	}
+
+	// --- ✅ NOW add the event listener for live calibration ---
+	document.getElementById('calibration-slider').addEventListener('input', calibrateScreen);
+
+
+        async function getDiagnosis() {
+            const formData = new FormData();
+
+            // Snellen data
+            let lastCorrectLine = 0;
+            let mistakes = 0;
+            for (let i = 0; i < snellenLines.length; i++) {
+                const input = document.getElementById(`input-${i}`).value.toUpperCase().replace(/\s+/g, '');
+                const correct = snellenLines[i].letters.join('').toUpperCase();
+                if (input.length > 0) {
+                    if (input === correct) {
+                        lastCorrectLine = i;
+                    } else {
+                        mistakes = correct.length - input.split('').filter((ch, idx) => ch === correct[idx]).length;
+                        lastCorrectLine = i;
+                        break;
+                    }
+                }
+            }
+
+            const snellenData = {
+                line: lastCorrectLine,
+                mistakes: mistakes,
+                age: parseInt(document.getElementById('dry_age').value),
+                effort: parseInt(document.getElementById(`effort-${lastCorrectLine}`).value)
+            };
+            formData.append('snellen_data', JSON.stringify(snellenData));
+
+            // Dry Eye Data
+            const dryEyeData = {
+                Gender: document.getElementById('gender').value,
+                Age: parseInt(document.getElementById('dry_age').value),
+                Sleep_duration: parseFloat(document.getElementById('sleep_duration').value),
+                Sleep_quality: parseInt(document.getElementById('sleep_quality').value),
+                Stress_level: parseInt(document.getElementById('stress_level').value),
+                Sleep_disorder: document.getElementById('sleep_disorder').value,
+                Wake_up_during_night: document.getElementById('wake_up_during_night').value,
+                Feel_sleepy_during_day: document.getElementById('feel_sleepy').value,
+                Caffeine_consumption: document.getElementById('caffeine').value,
+                Alcohol_consumption: document.getElementById('alcohol').value,
+                Smoking: document.getElementById('smoking').value,
+                Smart_device_before_bed: document.getElementById('smart_device').value,
+                Average_screen_time: parseFloat(document.getElementById('screen_time').value),
+                Blue_light_filter: document.getElementById('blue_light').value,
+                Discomfort_Eye_strain: document.getElementById('eye_strain').value,
+                Redness_in_eye: document.getElementById('redness').value,
+                Itchiness_Irritation_in_eye: document.getElementById('itchiness').value,
+                Systolic: parseFloat(document.getElementById('systolic').value),
+                Diastolic: parseFloat(document.getElementById('diastolic').value)
+            };
+            formData.append('dry_eye_data', JSON.stringify(dryEyeData));
+
+            const fileInput = document.getElementById('eye-image');
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            let output = "";
+            if (data.snellen_prediction) {
+                output += `<p>Snellen Diagnosis: <strong>${data.snellen_prediction.diagnosis}</strong></p>`;
+            }
+            if (data.dry_eye_prediction) {
+                output += `<p>Dry Eye: <strong>${data.dry_eye_prediction.dry_eye_probability}</strong></p>`;
+            }
+            if (data.image_prediction) {
+                output += `<p>Image Diagnosis: <strong>${data.image_prediction.predicted_class_name}</strong></p>`;
+            }
+            document.getElementById('result').innerHTML = output;
+        }
+    </script>
+
+</body>
+
+<style>
+/* Add this inside your existing <style> */
+
+/* General smooth movement */
+section {
+    transition: background-color 1s ease, transform 1s ease, opacity 1s ease;
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+/* Different backgrounds for each section */
+#snellen-test {
+    background-color: #F5F5F5;
+}
+
+#dry-eye-test {
+    background-color: #EFE6DD;
+}
+
+#image-upload {
+    background-color: #F8F1E7;
+}
+
+/* When the section is visible */
+.section-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes swirlBackground {
+    0% { background-position: 0 0; }
+    100% { background-position: 1000px 1000px; }
+}
+
+body {
+    background-color: #EEE8DC;
+    background-image: radial-gradient(circle, #EEE8DC, #d6d2c4, #c5bfb0);
+    background-size: 2000px 2000px;
+    animation: swirlBackground 20s linear infinite;
+}
+
+.shine {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    color: #555;
+}
+
+.shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.1) 100%);
+    transform: skewX(-20deg);
+    animation: shineMove 2.5s infinite;
+}
+
+@keyframes shineMove {
+    0% { left: -75%; }
+    100% { left: 125%; }
+}
+</style>
+
+<style>
+/* Sunglasses floating background */
+
+#floating-sunglasses {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    width: 150px;
+    height: auto;
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.show-sunglasses {
+    opacity: 0.2;
+    transform: translateX(-50%) scale(1);
+}
+
+@keyframes float {
+    0% { transform: translateX(-50%) translateY(0px) scale(1); }
+    50% { transform: translateX(-50%) translateY(-20px) scale(1); }
+    100% { transform: translateX(-50%) translateY(0px) scale(1); }
+}
+
+.show-sunglasses {
+    animation: float 6s ease-in-out infinite;
+}
+</style>
+
+</html>
+

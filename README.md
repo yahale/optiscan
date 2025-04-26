@@ -32,8 +32,25 @@ Access the app at: http://localhost:8000
 git clone https://github.com/yahale/optiscan.git
 cd optiscan
 
-#after extracting the models from the docker image (see Section: For End Users)
-# Build with Docker:
+# Download ML models from google drive:
+https://drive.google.com/drive/folders/10_n7GLdp4thFNeqN_nyRfj0gFP4tRt6C?usp=sharing
+
+#Alternatively you can extract the models from the docker image using the below commands:
+docker pull yahale/optiscan:latest
+
+# Create a stopped container
+docker create --name optiscan_temp yahale/optiscan:latest
+
+# Copy all model files from the container's root directory
+docker cp optiscan_temp:/dry_eye_rf_model_updated.pkl .
+docker cp optiscan_temp:/my_model.keras .
+docker cp optiscan_temp:/snellen_model.pkl .
+docker cp optiscan_temp:/snellen_label_encoder.pkl .
+
+
+# Build a new Docker image with your changes
 docker build -t optiscan-api:latest .
+
+# Run a container from the new image
 docker run -p 8000:8000 optiscan-api:latest
 ```

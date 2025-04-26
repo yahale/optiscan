@@ -3,7 +3,7 @@
 A FastAPI-based web application for diagnosing eye conditions from images, with integrated Snellen vision test and dry eye assessment.
 
 ## Features
-- Image-based disease detection (Glaucoma, Cataracts, etc.)
+- Image-based disease detection (Eyelid Disease, Cataracts, etc.)
 - Snellen visual acuity test
 - Dry eye syndrome assessment
 - Dockerized for easy deployment

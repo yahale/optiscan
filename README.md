@@ -18,13 +18,13 @@ A FastAPI-based web application for diagnosing eye conditions from images, with 
 ### Using Docker (Recommended)
 ```bash
 # Pull the pre-built image (includes ML models)
-docker pull yourdockerhub/eye-diagnosis-app:latest
+docker pull yahale/optiscan:latest
 
 # Run the application
-docker run -p 8000:8000 yourdockerhub/eye-diagnosis-app
+docker run -p 8000:8000 yahale/optiscan
 
 Access the app at: http://localhost:8000
-
+```
 
 ## Quick Start (For Developers)
 ```bash

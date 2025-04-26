@@ -23,7 +23,8 @@ docker pull yahale/optiscan:latest
 # Run the application
 docker run -p 8000:8000 yahale/optiscan
 
-Access the app at: http://localhost:8000
+# Access the app at:
+http://localhost:8000
 ```
 
 ## Quick Start (For Developers)

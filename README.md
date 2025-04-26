@@ -32,6 +32,7 @@ Access the app at: http://localhost:8000
 git clone https://github.com/yahale/optiscan.git
 cd optiscan
 
+#fter extracting the models from the docker image (see Section: For End Users)
 # Build with Docker:
 docker build -t optiscan-api:latest .
 docker run -p 8000:8000 optiscan-api:latest

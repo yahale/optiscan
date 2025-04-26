@@ -34,6 +34,7 @@ git clone https://github.com/yahale/optiscan.git
 cd optiscan
 
 # Download ML models from google drive:
+# Datasets are also found in this link (optional)
 https://drive.google.com/drive/folders/10_n7GLdp4thFNeqN_nyRfj0gFP4tRt6C?usp=sharing
 
 #Alternatively you can extract the models from the docker image using the below commands:

@@ -27,3 +27,12 @@ Access the app at: http://localhost:8000
 
 
 ## Quick Start (For Developers)
+```bash
+# Clone and prepare models:
+git clone https://github.com/yahale/optiscan.git
+cd optiscan
+
+# Build with Docker:
+docker build -t optiscan-api:latest .
+docker run -p 8000:8000 optiscan-api:latest
+```
